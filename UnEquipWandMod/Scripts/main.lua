@@ -14,7 +14,7 @@ function PlayerGear()
     then
 
         local GearItemID = GearManager.GetEquippedGearItemID(GearManager, BipedPlayer, 1)
-               
+     
         if(GearManager.IsHoodUp(GearManager, BipedPlayer))
         then
           GearManager.SetHoodPosition(GearManager, BipedPlayer, GearItemID, false, true) 
@@ -30,9 +30,10 @@ function PlayerUnEquipWand()
 
     if(BipedPlayer:IsValid())
     then
-        BipedPlayer.SetPartialBodyState(17)
-        BipedPlayer.UnEquipWand()
-        BipedPlayer.SetPartialBodyState(0)
+        local eGetRightArmState = BipedPlayer.GetRightArmState(15)
+        BipedPlayer.SetRightArmState(2, 15, true);
+        BipedPlayer.UnEquipWand()	
+        BipedPlayer.SetRightArmState(eGetRightArmState, 15, true);
     else
         print("No instance of class 'Biped_Player' was found.")
     end
@@ -46,6 +47,13 @@ RegisterKeyBind(Key.F6, function()
     end)
 end)
 
+RegisterKeyBind(Key.F6, {ModifierKey.SHIFT}, function()
+    ExecuteInGameThread(function()
+        Init()
+        -- print("PlayerUnEquipWand\n")
+        PlayerUnEquipWand()	
+    end)
+end)
 
 RegisterKeyBind(Key.F7, function()
     ExecuteInGameThread(function()
