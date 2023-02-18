@@ -1,6 +1,29 @@
 local BipedPlayer = nil
 local GearManager = nil
 
+local EGearSlotIDEnum = {
+  HEAD = 0,
+  OUTFIT = 1,
+  BACK = 2,
+  NECK = 3,
+  HAND = 4,
+  FACE = 5,
+  Num = 6,
+  EGearSlotIDEnum_MAX = 7
+}
+
+local EGearSavedItemIDEnum = {
+  HEAD = nil,
+  OUTFIT = nil,
+  BACK = nil,
+  NECK = nil,
+  HAND = nil,
+  FACE = nil,
+  Num = nil,
+  EGearSlotIDEnum_MAX = nil
+}
+
+
 function Init()
     BipedPlayer = FindFirstOf("Biped_Player")
     GearManager = FindFirstOf("GearManager")
@@ -8,18 +31,18 @@ function Init()
 end
 
 
-function PlayerGear()
+function HoodToggle()
 
     if(GearManager:IsValid() and BipedPlayer:IsValid())
     then
 
-        local GearItemID = GearManager.GetEquippedGearItemID(GearManager, BipedPlayer, 1)
+        local GearItemID = GearManager:GetEquippedGearItemID(BipedPlayer, EGearSlotIDEnum.OUTFIT)
      
-        if(GearManager.IsHoodUp(GearManager, BipedPlayer))
+        if GearManager:IsHoodUp(BipedPlayer)
         then
-          GearManager.SetHoodPosition(GearManager, BipedPlayer, GearItemID, false, true) 
+          GearManager:SetHoodPosition(BipedPlayer, GearItemID, false, true)
         else
-          GearManager.SetHoodPosition(GearManager, BipedPlayer, GearItemID, true, true) 
+          GearManager:SetHoodPosition(BipedPlayer, GearItemID, true, true)
         end
     else
         print("No instance of class 'GearManager' was found.")
@@ -40,6 +63,21 @@ function PlayerUnEquipWand()
 end
 
 
+function TogglePlayerGear(SlotID)
+    if (GearManager:IsValid() and BipedPlayer:IsValid())
+    then
+        if (GearManager:CanUnequipActorSlotID(BipedPlayer, SlotID))
+        then
+            EGearSavedItemIDEnum[SlotID] = GearManager:GetActorEquippedGearItemID(BipedPlayer, SlotID)
+            GearManager:UnequipActorSlotID(BipedPlayer, SlotID, true)
+        elseif EGearSavedItemIDEnum[SlotID] ~= nil
+        then
+            GearManager:SetActorEquippedGearItemID(BipedPlayer, EGearSavedItemIDEnum[SlotID], true)
+        end
+    end
+end
+
+
 RegisterKeyBind(Key.F6, function()
     ExecuteInGameThread(function()
         Init()
@@ -50,14 +88,52 @@ end)
 RegisterKeyBind(Key.F6, {ModifierKey.SHIFT}, function()
     ExecuteInGameThread(function()
         Init()
-        -- print("PlayerUnEquipWand\n")
-        PlayerUnEquipWand()	
+        PlayerUnEquipWand()
     end)
 end)
 
 RegisterKeyBind(Key.F7, function()
     ExecuteInGameThread(function()
         Init()
-        PlayerGear()	
+        HoodToggle()
+    end)
+end)
+
+
+RegisterKeyBind(Key.F1, { ModifierKey.CONTROL }, function()
+    ExecuteInGameThread(function()
+        Init()
+        TogglePlayerGear(EGearSlotIDEnum.HEAD)
+    end)
+end)
+
+RegisterKeyBind(Key.F2, { ModifierKey.CONTROL }, function()
+    ExecuteInGameThread(function()
+        Init()
+        TogglePlayerGear(EGearSlotIDEnum.OUTFIT)
+    end)
+end)
+RegisterKeyBind(Key.F3, { ModifierKey.CONTROL }, function()
+    ExecuteInGameThread(function()
+        Init()
+        TogglePlayerGear(EGearSlotIDEnum.BACK)
+    end)
+end)
+RegisterKeyBind(Key.F4, { ModifierKey.CONTROL }, function()
+    ExecuteInGameThread(function()
+        Init()
+        TogglePlayerGear(EGearSlotIDEnum.NECK)
+    end)
+end)
+RegisterKeyBind(Key.F5, { ModifierKey.CONTROL }, function()
+    ExecuteInGameThread(function()
+        Init()
+        TogglePlayerGear(EGearSlotIDEnum.HAND)
+    end)
+end)
+RegisterKeyBind(Key.F6, { ModifierKey.CONTROL }, function()
+    ExecuteInGameThread(function()
+        Init()
+        TogglePlayerGear(EGearSlotIDEnum.FACE)
     end)
 end)
